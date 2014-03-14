@@ -1,12 +1,14 @@
 require.config({
     paths: {
-        "jquery": "js/jquery-1.11.0.min",
+        "jquery": "js/jquery-2.1.0.min",
         "underscore": "js/underscore-min",
         "bootstrap": "js/bootstrap.min",
         "typeahead": "js/bootstrap3-typeahead.min",
         "text": "js/plugins/text"
     },
     shim: {
+        "typeahead": ["jquery"],
+        "bootstrap": ["jquery"]
     }
 });
 
