@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>7d Weather</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="7 day weather forecast for your city">
+    <meta name="author" content="Ramsey D'silva">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.min.js"></script>
+
+    <script>
+        function formatItem(item) { return item.name; }
+        $(document).ready(function() {
+            var input = $("#city");
+            input.select2({
+                placeholder: input.attr("placeholder"),
+                minimumInputLength: 3,
+                ajax: {
+                    url: "http://api.openweathermap.org/data/2.1/find/name?q=Tor&type=like",
+                    dataType: "jsonp",
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            type: "like"
+                        }
+                    },
+                    results: function (data, page) {
+                        return { results: data.list }
+                    },
+                },
+                formatResult: formatItem,
+                formatSelection: formatItem
+            });
+        });
+    </script>
+    <style>
+        .select2-container { width: 100%; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-static-top navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">7d Weather</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#about">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div id="city"  type="search" placeholder="Select your city"></div>
+    </div>
+</body>
+</html>
+
