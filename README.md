@@ -1,6 +1,8 @@
 ## Weather Ducky - Weather forecasting app
 
-WeatherDucky is a realtime weather forecasting web application built using HTML(5), CSS(3) and Javascript. A user is able to query the 7 day weather forecast for any city. Daily data is displayed for average/min/max temperature and general weather conditions. Weekly averages for Atmospheric pressure, humidity and wind speed are also displayed.
+WeatherDucky is a realtime weather forecasting web application built using HTML(5), CSS(3) and Javascript. A user is able to query the 7 day weather forecast for any city. Daily data is displayed for average/min/max temperature and general weather conditions. Weekly averages for Atmospheric pressure, humidity and wind speed are also displayed. 
+
+To view the app, go to http://weatherducky.com/.
 
 ***
 
@@ -12,26 +14,25 @@ For proper functioning of the webapp, a working internet connection is required 
 
 ### Install
 
-Firstly, clone the repository
+Firstly, clone the weatherducky repository
 
 ```
-git clone https://github.com/ramseydsilva/weatherducky
+git clone https://github.com/ramseydsilva/weatherducky.git
 cd weatherducky
-
 ```
 
 A simple webserver can be configured to run it. To run using a python web server, run the command at the root of the project:
 
 ```
 python -m SimpleHTTPServer 4000
-
 ```
 
-To see the app, point your browser to http://localhost:4000.
+To see the app, point your browser to http://localhost:4000. The app is also hosted [here](http://weatherducky.com/).
 
 ***
 
 ### Features
+
 * Realtime weather data
 * GeoLocation
 * Responsive UI
