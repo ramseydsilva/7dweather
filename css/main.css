@@ -5,6 +5,7 @@ body {
     -o-background-size: cover;
     background-size: cover;
     height: 100%;
+    min-height: 600px;
 }
 
 .navbar-inverse .navbar-header span {
