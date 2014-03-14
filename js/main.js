@@ -1,10 +1,10 @@
 require.config({
     paths: {
-        "jquery": "js/jquery-2.1.0.min",
-        "underscore": "js/underscore-min",
-        "bootstrap": "js/bootstrap.min",
-        "typeahead": "js/bootstrap3-typeahead.min",
-        "text": "js/plugins/text"
+        "jquery": "jquery-2.1.0.min",
+        "underscore": "underscore-min",
+        "bootstrap": "bootstrap.min",
+        "typeahead": "bootstrap3-typeahead.min",
+        "text": "plugins/text"
     },
     shim: {
         "typeahead": ["jquery"],
@@ -15,7 +15,7 @@ require.config({
 define([
     "jquery",
     "underscore",
-    "text!js/templates/day.html",
+    "text!templates/day.html",
     "typeahead",
     "bootstrap"
 ], function($, _, dayTemplate) {
