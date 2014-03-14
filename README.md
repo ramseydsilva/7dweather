@@ -1,8 +1,8 @@
 ## Weather Ducky - Weather forecasting app
 
-WeatherDucky is a realtime weather forecasting web application built using HTML(5), CSS(3) and Javascript. A user is able to query the 7 day weather forecast for any city. Daily data is displayed for average/min/max temperature and general weather conditions. Weekly averages for Atmospheric pressure, humidity and wind speed are also displayed. 
+WeatherDucky is a realtime weather forecasting web application built using HTML(5), CSS(3) and Javascript. A user is able to query the 7 day weather forecast for major international cities. Daily data is displayed for average/min/max temperature and general weather conditions. Weekly averages for Atmospheric pressure, humidity and wind speed are also displayed. 
 
-To view the app, go to http://weatherducky.com/.
+To view the app, visit http://weatherducky.com/!
 
 ***
 
