@@ -23,7 +23,7 @@ define([
     "typeahead",
     "bootstrap"
 ], function($, _, dayTemplate, summaryTemplate) {
-    var locations = {}, city = "", title = "", results = [],
+    var cities = [], results = {};
     days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
     months = ['January','February','March','April','May','June','July','August','September','October','November','December'],
     images = {  "light rain": 'cloudy_s_rain.png',
@@ -43,13 +43,6 @@ define([
                     "overcast clouds": "cloudy.png"
                 };
 
-    function processCity(item) {
-        if (typeof locations[item.name.toLowerCase()] == "undefined") {
-            locations[item.name.toLowerCase()] = item;
-        }
-        return item.name;
-    }
-
     function clearResults() {
         $('#title').html("");
         $('#chart').html("");
@@ -57,30 +50,31 @@ define([
     }
 
     function displayResults() {
-        $('#title').html(title);
+        $('#title').html("Weather Forecast for " + results.city.name);
         $('#chart').html("");
         $('#summary').html("");
 
         var totalTemp = 0, context = {};
 
         // Display Weekly Data
-        _.each(results, function(data) {
-            var date = new Date(data.dt * 1000);
-            var avgTemp = Math.floor((data.temp.max + data.temp.min) / 2);
+        var weekData = results.list;
+        _.each(weekData, function(dayData) {
+            var date = new Date(dayData.dt * 1000);
+            var avgTemp = Math.floor((dayData.temp.max + dayData.temp.min) / 2);
             context = {
                 day: days[date.getDay()],
                 date: months[date.getMonth()] + " " + date.getDate(),
-                maxTemp: data.temp.max,
-                minTemp: data.temp.min,
+                maxTemp: dayData.temp.max,
+                minTemp: dayData.temp.min,
                 avgTemp: avgTemp,
-                desc: data.weather[0].main,
-                img: images[data.weather[0].description],
-                longDesc: data.weather[0].description,
-                humidity: data.humidity,
-                pressure: data.pressure,
-                speed: data.speed,
-                isFirst: !_.indexOf(results, data),
-                isLast: results.length == _.indexOf(results, data) + 1
+                desc: dayData.weather[0].main,
+                img: images[dayData.weather[0].description],
+                longDesc: dayData.weather[0].description,
+                humidity: dayData.humidity,
+                pressure: dayData.pressure,
+                speed: dayData.speed,
+                isFirst: !_.indexOf(weekData, dayData),
+                isLast: weekData.length == _.indexOf(weekData, dayData) + 1
             };
             totalTemp += avgTemp;
             $('#chart').append(_.template(dayTemplate, context));
@@ -89,21 +83,21 @@ define([
         // Display Weekly Averages
         context = {
             avgTemp: (totalTemp / 7).toFixed(2),
-            avgHumidity: (_.reduce(results, function(memo, data) { return memo + data.humidity }, 0) / 7).toFixed(2),
-            avgPressure: (_.reduce(results, function(memo, data) { return memo + data.pressure }, 0) / 7).toFixed(2),
-            avgSpeed: (_.reduce(results, function(memo, data) { return memo + data.speed }, 0) / 7).toFixed(2)
+            avgHumidity: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.humidity }, 0) / 7).toFixed(2),
+            avgPressure: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.pressure }, 0) / 7).toFixed(2),
+            avgSpeed: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.speed }, 0) / 7).toFixed(2)
         }
         $('#summary').html(_.template(summaryTemplate, context));
     }
 
     function hideDropDownIfNotNeeded() {
-        // If single element matches drop down element, close the drop down
-        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
+        // If city input value matches drop down element, close the drop down
+        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == $("#city").val().toLowerCase())
             $(".dropdown-menu").css("display", "none !important");
     }
 
     function fetchData() {
-        city = $("#city").val();
+        var city = $("#city").val();
 
         if (city == "") {
             // Input is blank, clear result pane
@@ -111,15 +105,14 @@ define([
         } else {
             hideDropDownIfNotNeeded();
 
-            // Check if the city in the input is a real city against the cities returned in the dropdown
-            if (typeof locations[city.toLowerCase()] != "undefined") {
+            // Check if the city in the input is a real city against the cities previously returned in the dropdown
+            if (_.find(cities, function(savedCity) { return savedCity.toLowerCase() == city.toLowerCase(); })) {
                 $.ajax({
                     url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + city,
                     dataType: "jsonp",
                     success: function(data) {
                         if (data.cod == "200") {
-                            title = "Weather Forecast for " + data.city.name;
-                            results = data.list;
+                            results = data;
                             displayResults();
                         }
                     },
@@ -137,30 +130,36 @@ define([
         }
     }
 
+    function fetchCities(query, callback) {
+        $.ajax({
+            url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,
+            dataType: "jsonp",
+            success: function (data) {
+                var newCities = _.map(data.list, function(newCity) { return newCity.name });
+                cities = _.union(cities, newCities);
+                callback(newCities); // callback is either to show dropdown or fetchData
+                hideDropDownIfNotNeeded();
+            }
+        });
+    }
+
     function getLocation(position) {
         var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
-        $.getJSON(url, function(data){
-            city = data.name;
-            locations[city.toLowerCase()] = "";
-            $("#city").val(city).trigger("change");
+        $.getJSON(url, function(city){
+            $("#city").val(city.name);
+            fetchCities(city.name, fetchData);
         });
     }
 
     $(document).ready(function() {
 
-        $("#city").keyup(function() {
-            fetchData();
-        });
-
-        $("#city").change(function() {
-            fetchData();
-        });
+        $("#city").keyup(fetchData).change(fetchData);
 
         if (!!$.url().param().city) {
             // City is specified in URL
-            city = $.url().param().city.replace("/", "");
-            locations[city.toLowerCase()] = "";
-            $("#city").val(city).trigger("change");
+            var city = $.url().param().city.replace("/", "");
+            $("#city").val(city);
+            fetchCities(city, fetchData);
         } else if (navigator.geolocation) {
             // Use HTML5 Geolocation to find users city
             navigator.geolocation.getCurrentPosition(getLocation);
@@ -171,16 +170,7 @@ define([
             minLength: 3,
             items: "all",
             autoSelect: false,
-            source: function(query, process) {
-                $.ajax({
-                    url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,
-                    dataType: "jsonp",
-                    success: function (data) {
-                        process(_.map(data.list, processCity));
-                        hideDropDownIfNotNeeded();
-                    }
-                });
-            }
+            source: fetchCities
         });
 
     });
