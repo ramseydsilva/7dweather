@@ -12,7 +12,7 @@ For proper functioning of the webapp, a working internet connection is required 
 
 ***
 
-### Install
+### Installation
 
 Firstly, clone the weatherducky repository
 
@@ -21,7 +21,7 @@ git clone https://github.com/ramseydsilva/weatherducky.git
 cd weatherducky
 ```
 
-A simple webserver can be configured to run it. To run using a python web server, run the command at the root of the project:
+A simple webserver can be configured to run it. To run using a python web server, run the command at the root of the project
 
 ```
 python -m SimpleHTTPServer 4000
@@ -47,7 +47,7 @@ To see the app, point your browser to http://localhost:4000. The app is also hos
 * [JQuery][jquery]
 * [requireJS][require]
 * [UnderscoreJS][underscore]
-* Versioning in [Git][git]
+* [Git][git]
 
 [openweatherapi]: http://openweathermap.org/wiki/API/JSON_API#Get_forecast
 [geo]: https://developer.mozilla.org/en/docs/WebAPI/Using_geolocation
