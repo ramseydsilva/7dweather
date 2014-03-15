@@ -142,14 +142,12 @@ define([
                 if (data.cod == "200") {
                     var newLocations = _.map(data.list, function(newLocation) {
                         if (newLocation.name == "" && newLocation.country != "")
-                            return query;
-                        return newLocation.name;
+                            return query; // Location is not a city
+                        return newLocation.name; // Location is city
                     });
                     locations = _.union(locations, newLocations);
-                    if (!!callback)
-                        callback(newLocations); // callback is either to show dropdown or fetchData
+                    callback(newLocations); // callback is either to show dropdown or fetchData
                     hideDropDownIfNotNeeded();
-                    return newLocations;
                 }
             }
         });
