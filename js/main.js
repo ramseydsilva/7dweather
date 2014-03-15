@@ -45,9 +45,39 @@ define([
                 };
 
     function clearResults() {
-        $('#title').html("");
-        $('#chart').html("");
-        $("#summary").html("");
+        $('#title, #summary, #commentary, #chart').html("");
+    }
+
+    function getIntro() {
+        var avgTemp = results.averages.avgTemp;
+        var intro = "Looks like a bright and warm week ahead!";
+        if (avgTemp < 20)
+            intro = "We are expected to have a moderately cold week.";
+        if (avgTemp < 10)
+            intro = "Looks like a pretty cold week ahead.";
+        if (avgTemp < 0)
+            intro = "Bundle up! It's gonna be freezing this week.";
+        return intro + " The average Temperature will be " + Math.floor(results.averages.avgTemp) + "&deg;C.";
+    }
+
+    function displayCommentary() {
+        var commentary = {};
+        commentary["intro"] = getIntro();
+        commentary["today"] = "Today's average temperature is " + results.list[0].context.avgTemp + "&deg; C.";
+        commentary["tomorrow"] = "Tomorrow the average temperature will be " + results.list[1].context.avgTemp + "&deg; C.";
+
+        $("#commentary").css("display", "block");
+        var keys = _.keys(commentary);
+        $("#commentary").html(commentary[keys[0]]);
+        (function myLoop (i) {
+            var next = (i + 1) % keys.length;
+            var prev = Math.abs((i - 1) % keys.length);
+            var text = commentary[keys[i]];
+            setTimeout(function () {
+                $("#commentary").html(commentary[keys[i]]);
+                myLoop(next);
+            }, commentary[keys[prev]].length*100)
+        })(keys.length);
     }
 
     function displayResults() {
@@ -57,14 +87,13 @@ define([
         if (results.city.name == "" && results.city.country != "")
             location = $("#location").val();
         $('#title').html("Weather Forecast for " + location);
-        $('#chart').html("");
-        $('#summary').html("");
+        $('#summary, #commentary, #chart').html("");
 
         var totalTemp = 0, context = {};
 
         // Display Weekly Data
         var weekData = results.list;
-        _.each(weekData, function(dayData) {
+        _.each(weekData, function(dayData, iterator) {
             var date = new Date(dayData.dt * 1000);
             var avgTemp = Math.floor((dayData.temp.max + dayData.temp.min) / 2);
             context = {
@@ -82,18 +111,21 @@ define([
                 isFirst: !_.indexOf(weekData, dayData),
                 isLast: weekData.length == _.indexOf(weekData, dayData) + 1
             };
+            results.list[iterator].context = context;
             totalTemp += avgTemp;
             $('#chart').append(_.template(dayTemplate, context));
         });
 
         // Display Weekly Averages
-        context = {
+        results["averages"] = context = {
             avgTemp: (totalTemp / 7).toFixed(2),
             avgHumidity: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.humidity }, 0) / 7).toFixed(2),
             avgPressure: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.pressure }, 0) / 7).toFixed(2),
             avgSpeed: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.speed }, 0) / 7).toFixed(2)
         }
         $('#summary').html(_.template(summaryTemplate, context));
+
+        displayCommentary();
     }
 
     function hideDropDownIfNotNeeded() {
