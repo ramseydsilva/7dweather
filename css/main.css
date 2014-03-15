@@ -8,6 +8,10 @@ body {
     min-height: 600px;
 }
 
+hr {
+    display: none;
+}
+
 .navbar-inverse .navbar-header span {
     color: rgb(255, 255, 165);
     font-size: 20px;
@@ -32,10 +36,10 @@ body {
 }
 
 @media (max-width: 600px) {
-.weather.visible-xs li.img {
-    float: center;
-    clear: both;
-}
+    .weather.visible-xs li.img {
+        float: center;
+        clear: both;
+    }
 }
 
 #summary, .weather {
@@ -93,7 +97,7 @@ body {
     position: relative;
 }
 .right-inner-addon input {
-    padding-right: 30px;    
+    padding-right: 30px;
 }
 .right-inner-addon i {
     position: absolute;

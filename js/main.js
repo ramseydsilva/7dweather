@@ -23,13 +23,10 @@ define([
     "typeahead",
     "bootstrap"
 ], function($, _, dayTemplate, summaryTemplate) {
-    var locations = {};
-    var city = "";
-    var title = "";
-    var results = [];
-    var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var images = {  "light rain": 'cloudy_s_rain.png',
+    var locations = {}, city = "", title = "", results = [],
+    days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    months = ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    images = {  "light rain": 'cloudy_s_rain.png',
                     "light clouds": 'cloudy_s_sunny.png',
                     "scattered clouds": 'cloudy_s_sunny.png',
                     "fog": 'fog.png',
@@ -46,7 +43,7 @@ define([
                     "overcast clouds": "cloudy.png"
                 };
 
-    function processItem(item) {
+    function processCity(item) {
         if (typeof locations[item.name.toLowerCase()] == "undefined") {
             locations[item.name.toLowerCase()] = item;
         }
@@ -54,8 +51,7 @@ define([
     }
 
     function clearResults() {
-        title = "";
-        $('#title').html(title);
+        $('#title').html("");
         $('#chart').html("");
         $("#summary").html("");
     }
@@ -64,11 +60,14 @@ define([
         $('#title').html(title);
         $('#chart').html("");
         $('#summary').html("");
-        var totalTemp = 0;
+
+        var totalTemp = 0, context = {};
+
+        // Display Weekly Data
         _.each(results, function(data) {
             var date = new Date(data.dt * 1000);
             var avgTemp = Math.floor((data.temp.max + data.temp.min) / 2);
-            var context = {
+            context = {
                 day: days[date.getDay()],
                 date: months[date.getMonth()] + " " + date.getDate(),
                 maxTemp: data.temp.max,
@@ -86,6 +85,8 @@ define([
             totalTemp += avgTemp;
             $('#chart').append(_.template(dayTemplate, context));
         });
+
+        // Display Weekly Averages
         context = {
             avgTemp: (totalTemp / 7).toFixed(2),
             avgHumidity: (_.reduce(results, function(memo, data) { return memo + data.humidity }, 0) / 7).toFixed(2),
@@ -95,29 +96,40 @@ define([
         $('#summary').html(_.template(summaryTemplate, context));
     }
 
-    function fetchResults() {
+    function fetchData() {
         city = $("#city").val();
 
-        // If single element matches drop down element, close the drop down
-        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
-            $(".dropdown-menu").css("display", "none !important");
-
-        if (typeof locations[city.toLowerCase()] != "undefined") {
-            $.ajax({
-                url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + city,
-                dataType: "jsonp",
-                success: function(data) {
-                    if (data.cod == "200") {
-                        title = "Weather Forecast for " + data.city.name;
-                        results = data.list;
-                    }
-                },
-                complete: function(data) {
-                    displayResults();
-                }
-            });
-        } else {
+        if (city == "") {
+            // Input is blank, clear result pane
             clearResults();
+        } else {
+            // If single element matches drop down element, close the drop down
+            if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
+                $(".dropdown-menu").css("display", "none !important");
+
+            // Check if the city in the input is a real city against the cities returned in the dropdown
+            if (typeof locations[city.toLowerCase()] != "undefined") {
+                $.ajax({
+                    url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + city,
+                    dataType: "jsonp",
+                    success: function(data) {
+                        if (data.cod == "200") {
+                            title = "Weather Forecast for " + data.city.name;
+                            results = data.list;
+                            displayResults();
+                        }
+                    },
+                    error: function() {
+                        // Some error was thrown, need to handle this error
+                        clearResults();
+                        $("#title").html("An unidentified error has occured, please try again in some time");
+                    }
+                });
+            } else {
+                // Not a real city, so clear the result Pane
+                clearResults();
+                $("#title").html("Is that a real city? Please try again.");
+            }
         }
     }
 
@@ -132,20 +144,22 @@ define([
 
     $(document).ready(function() {
 
-        $("#city").on({
-            keyUp: fetchResults,
-            change: fetchResults
+        $("#city").keyup(function() {
+            fetchData();
         });
 
-        if (!!!$.url().param().city) {
-            // HTML5 Geolocation
-            if (navigator.geolocation)
-                navigator.geolocation.getCurrentPosition(getLocation);
-        } else {
+        $("#city").change(function() {
+            fetchData();
+        });
+
+        if (!!$.url().param().city) {
             // City is specified in URL
             city = $.url().param().city.replace("/", "");
             locations[city.toLowerCase()] = "";
             $("#city").val(city).trigger("change");
+        } else if (navigator.geolocation) {
+            // Use HTML5 Geolocation to find users city
+            navigator.geolocation.getCurrentPosition(getLocation);
         }
 
         $("#city").typeahead({
@@ -158,11 +172,11 @@ define([
                     url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,
                     dataType: "jsonp",
                     success: function (data) {
-                        process(_.map(data.list, processItem));
-                        fetchResults();
+                        process(_.map(data.list, processCity));
                     }
                 });
             }
         });
+
     });
 });
