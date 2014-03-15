@@ -46,6 +46,7 @@ define([
         }
         return item.name;
     }
+
     function clearResults() {
         title = "";
         $('#title').html(title);
@@ -66,7 +67,8 @@ define([
                 desc: data.weather[0].main,
                 img: images[data.weather[0].description],
                 longDesc: data.weather[0].description,
-                isFirst: !_.indexOf(results, data)
+                isFirst: !_.indexOf(results, data),
+                isLast: results.length == _.indexOf(results, data) + 1
             };
             $('#chart').append(_.template(dayTemplate, context));
         });
@@ -74,13 +76,18 @@ define([
 
     function fetchResults() {
         city = $("#city").val();
+
+        // If single element matches drop down element, close the drop down
+        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
+            $(".dropdown-menu").css("display", "none !important");
+
         if (typeof locations[city.toLowerCase()] != "undefined") {
             $.ajax({
                 url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + city,
                 dataType: "jsonp",
                 success: function(data) {
                     if (data.cod == "200") {
-                        title = "Displaying Weather Forecase for " + city;
+                        title = "Displaying Weather Forecast for " + data.city.name;
                         results = data.list;
                     }
                 },
@@ -93,11 +100,25 @@ define([
         }
     }
 
+    function getLocation(position) {
+        var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
+        $.getJSON(url, function(data){
+            city = data.name;
+            locations[city.toLowerCase()] = "";
+            $("#city").val(city).trigger("change");
+        });
+    }
+
     $(document).ready(function() {
+        // HTML5 Geolocation
+        if (navigator.geolocation)
+            navigator.geolocation.getCurrentPosition(getLocation);
+
         $("#city").typeahead({
             displayKey: "name",
             minLength: 3,
             items: "all",
+            autoSelect: false,
             source: function(query, process) {
                 $.ajax({
                     url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,

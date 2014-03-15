@@ -16,12 +16,25 @@ body {
 }
 .weather.visible-xs li.text {
     padding-top: 13px;
+    font-size: 18px;
 }
+
+.weather.visible-xs li.img {
+    float: right;
+}
+
+@media (max-width: 600px) {
+.weather.visible-xs li.img {
+    float: center;
+    clear: both;
+}
+}
+
 .weather {
     background-color: white;
     list-style: none;
     margin: 0 0 10px 0;
-    padding: 5px 10px;
+    padding: 7px 10px;
 }
 
 .navbar-inverse { background-color: #465B9F; }
@@ -57,4 +70,20 @@ body {
         *width: 14.28%;
         padding: 5px !important;
     }
+}
+
+.weatherBlock.trueFirst { padding-left: 17px !important; }
+.weatherBlock.trueLast { padding-right: 17px !important; }
+
+.right-inner-addon {
+    position: relative;
+}
+.right-inner-addon input {
+    padding-right: 30px;    
+}
+.right-inner-addon i {
+    position: absolute;
+    right: 0px;
+    padding: 10px 12px;
+    pointer-events: none;
 }
