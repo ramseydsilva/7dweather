@@ -37,6 +37,7 @@ define([
                     "rain and clouds": 'rain_s_cloudy.png',
                     "moderate rain": "rain_s_cloudy.png",
                     "snow": 'snow.png',
+                    "heavy snow": 'snow.png',
                     "light snow": 'snow_s_cloudy.png',
                     "sky is clear": 'sunny.png',
                     "light sun": 'sunny_s_cloudy.png',
@@ -50,6 +51,8 @@ define([
     }
 
     function displayResults() {
+        hideDropDownIfNotNeeded();
+
         var location = results.city.name;
         if (results.city.name == "" && results.city.country != "")
             location = $("#location").val();
@@ -110,7 +113,6 @@ define([
             // Input is blank, clear result pane
             clearResults();
         } else {
-            hideDropDownIfNotNeeded();
 
             // Check if the location in the input is a real location against the cities previously returned in the dropdown
             if (isLocationPreviouslyFetched(location)) {
@@ -193,7 +195,8 @@ define([
             fetchLocations(location, fetchData);
         } else if (navigator.geolocation) {
             // Use HTML5 Geolocation to find users location
-            navigator.geolocation.getCurrentPosition(getLocation);
+            var options = {enableHighAccuracy: false, maximumAge: 15000, timeout: 10000};
+            navigator.geolocation.getCurrentPosition(getLocation, function(){}, options);
         }
 
         $("#location").typeahead({
