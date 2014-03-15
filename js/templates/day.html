@@ -1,8 +1,12 @@
 <div class="col-sm-2">
-    <ul class="weather">
+    <ul class="weather visible-xs">
+        <li class="text"><%= day %>, <%= date %> - Avg Temp: <%= avgTemp %> &deg;C - Min: <%= minTemp %> - Max:<%= maxTemp %></li>
+        <% if (!!img) { %><li class="img pull-right"><img src="img/<%= img %>" /></li><% } %>
+    </ul>
+    <ul class="weather hidden-xs">
         <li class="day"><%= day %></li>
         <li class="date"><%= date %></li>
-        <li class="avgTemp"><span><%= avgTemp %></span> &deg;C</li>
+        <li class="avgTemp"><span class="big"><%= avgTemp %></span><span class="hidden-sm"> &deg;C</span></li>
         <% if (!!img) { %><li class="img"><img src="img/<%= img %>" /></li><% } %>
         <li class="desc"><%= desc %></li>
         <li class="longDesc"><%= longDesc %></li>

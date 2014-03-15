@@ -6,6 +6,17 @@ body {
     background-size: cover;
 }
 
+.weather.visible-xs {
+    float: left;
+    width: 100%;
+}
+
+.weather.visible-xs li {
+    float: left;
+}
+.weather.visible-xs li.text {
+    padding-top: 13px;
+}
 .weather {
     background-color: white;
     list-style: none;
@@ -21,14 +32,14 @@ body {
 .weather .day { font-size: 22px; }
 .weather .date { font-size: 16px; }
 .weather .avgTemp { center; font-size: 30px; }
-.weather .avgTemp span { margin-left: 10px; font-size: 55px; }
+.weather .avgTemp span.big { margin-left: 10px; font-size: 55px; }
 .weather .desc { font-size: 20px; }
 
 @media (min-width: 768px){
     .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2  {
         width: 14.28%;
         *width: 14.28%;
-        padding: 10px !important;
+        padding: 5px !important;
     }
 }
 
@@ -36,7 +47,7 @@ body {
     .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2 {
         width: 14.28%;
         *width: 14.28%;
-        padding: 10px !important;
+        padding: 5px !important;
     }
 }
 
@@ -44,6 +55,6 @@ body {
     .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2 {
         width: 14.28%;
         *width: 14.28%;
-        padding: 10px !important;
+        padding: 5px !important;
     }
 }

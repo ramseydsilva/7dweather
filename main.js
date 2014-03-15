@@ -25,14 +25,20 @@ define([
     var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var images = {  "light rain": 'cloudy_s_rain.png',
                     "light clouds": 'cloudy_s_sunny.png',
+                    "scattered clouds": 'cloudy_s_sunny.png',
                     "fog": 'fog.png',
                     "few clouds": 'partly_cloudy.png',
+                    "broken clouds": 'partly_cloudy.png',
                     "rain": 'rain.png',
+                    "heavy intensity rain": 'rain.png',
                     "rain and clouds": 'rain_s_cloudy.png',
+                    "moderate rain": "rain_s_cloudy.png",
                     "snow": 'snow.png',
                     "light snow": 'snow_s_cloudy.png',
                     "sky is clear": 'sunny.png',
-                    "light sun": 'sunny_s_cloudy.png'};
+                    "light sun": 'sunny_s_cloudy.png',
+                    "overcast clouds": "cloudy.png"
+                };
 
     function processItem(item) {
         if (typeof locations[item.name.toLowerCase()] == "undefined") {
@@ -88,10 +94,6 @@ define([
     }
 
     $(document).ready(function() {
-        $("#city").val("Toronto");
-        processItem({"name": "Toronto"})
-        fetchResults();
-
         $("#city").typeahead({
             displayKey: "name",
             minLength: 3,
