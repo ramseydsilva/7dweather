@@ -96,6 +96,12 @@ define([
         $('#summary').html(_.template(summaryTemplate, context));
     }
 
+    function hideDropDownIfNotNeeded() {
+        // If single element matches drop down element, close the drop down
+        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
+            $(".dropdown-menu").css("display", "none !important");
+    }
+
     function fetchData() {
         city = $("#city").val();
 
@@ -103,9 +109,7 @@ define([
             // Input is blank, clear result pane
             clearResults();
         } else {
-            // If single element matches drop down element, close the drop down
-            if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == city.toLowerCase())
-                $(".dropdown-menu").css("display", "none !important");
+            hideDropDownIfNotNeeded();
 
             // Check if the city in the input is a real city against the cities returned in the dropdown
             if (typeof locations[city.toLowerCase()] != "undefined") {
@@ -173,6 +177,7 @@ define([
                     dataType: "jsonp",
                     success: function (data) {
                         process(_.map(data.list, processCity));
+                        hideDropDownIfNotNeeded();
                     }
                 });
             }
