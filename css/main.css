@@ -42,7 +42,13 @@ hr {
     }
 }
 
-#summary, .weather {
+#commentary {
+    display: none;
+    font-size: 16px;
+    font-weight: 200;
+}
+
+#commentary, #summary, .weather {
     background-color: white;
 }
 
@@ -51,7 +57,8 @@ hr {
     margin: 0 0 10px 0;
     padding: 7px 10px;
 }
-#summary .data {
+
+#commentary, #summary .data {
     padding: 7px 10px;
     margin-bottom: 20px;
 }

@@ -82,7 +82,6 @@ define([
             }, commentary[keys[prev]].length*100)
         };
         commentLoop(keys.length);
->>>>>>> Stashed changes
     }
 
     function displayResults() {
@@ -92,14 +91,13 @@ define([
         if (results.city.name == "" && results.city.country != "")
             location = $("#location").val();
         $('#title').html("Weather Forecast for " + location);
-        $('#chart').html("");
-        $('#summary').html("");
+        $('#summary, #commentary, #chart').html("");
 
         var totalTemp = 0, context = {};
 
         // Display Weekly Data
         var weekData = results.list;
-        _.each(weekData, function(dayData) {
+        _.each(weekData, function(dayData, iterator) {
             var date = new Date(dayData.dt * 1000);
             var avgTemp = Math.floor((dayData.temp.max + dayData.temp.min) / 2);
             context = {
@@ -117,18 +115,21 @@ define([
                 isFirst: !_.indexOf(weekData, dayData),
                 isLast: weekData.length == _.indexOf(weekData, dayData) + 1
             };
+            results.list[iterator].context = context;
             totalTemp += avgTemp;
             $('#chart').append(_.template(dayTemplate, context));
         });
 
         // Display Weekly Averages
-        context = {
+        results["averages"] = context = {
             avgTemp: (totalTemp / 7).toFixed(2),
             avgHumidity: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.humidity }, 0) / 7).toFixed(2),
             avgPressure: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.pressure }, 0) / 7).toFixed(2),
             avgSpeed: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.speed }, 0) / 7).toFixed(2)
         }
         $('#summary').html(_.template(summaryTemplate, context));
+
+        displayCommentary();
     }
 
     function hideDropDownIfNotNeeded() {
