@@ -4,6 +4,7 @@ body {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    height: 100%;
 }
 
 .navbar-inverse .navbar-header span {
@@ -47,6 +48,7 @@ body {
 }
 #summary .data {
     padding: 7px 10px;
+    margin-bottom: 20px;
 }
 
 .navbar-inverse { background-color: #465B9F; }
