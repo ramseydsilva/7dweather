@@ -135,10 +135,12 @@ define([
             url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,
             dataType: "jsonp",
             success: function (data) {
-                var newCities = _.map(data.list, function(newCity) { return newCity.name });
-                cities = _.union(cities, newCities);
-                callback(newCities); // callback is either to show dropdown or fetchData
-                hideDropDownIfNotNeeded();
+                if (data.cod == "200") {
+                    var newCities = _.map(data.list, function(newCity) { return newCity.name });
+                    cities = _.union(cities, newCities);
+                    callback(newCities); // callback is either to show dropdown or fetchData
+                    hideDropDownIfNotNeeded();
+                }
             }
         });
     }
@@ -146,8 +148,10 @@ define([
     function getLocation(position) {
         var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
         $.getJSON(url, function(city){
-            $("#city").val(city.name);
-            fetchCities(city.name, fetchData);
+            if (city.cod == "200") {
+                $("#city").val(city.name);
+                fetchCities(city.name, fetchData);
+            }
         });
     }
 
