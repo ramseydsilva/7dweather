@@ -4,10 +4,12 @@ require.config({
         "underscore": "underscore-min",
         "bootstrap": "bootstrap.min",
         "typeahead": "bootstrap3-typeahead.min",
+        "purl": "purl",
         "text": "plugins/text"
     },
     shim: {
         "typeahead": ["jquery"],
+        "purl": ["jquery"],
         "bootstrap": ["jquery"]
     }
 });
@@ -17,6 +19,7 @@ define([
     "underscore",
     "text!templates/day.html",
     "text!templates/summary.html",
+    "purl",
     "typeahead",
     "bootstrap"
 ], function($, _, dayTemplate, summaryTemplate) {
@@ -128,9 +131,22 @@ define([
     }
 
     $(document).ready(function() {
-        // HTML5 Geolocation
-        if (navigator.geolocation)
-            navigator.geolocation.getCurrentPosition(getLocation);
+
+        $("#city").on({
+            keyUp: fetchResults,
+            change: fetchResults
+        });
+
+        if (!!!$.url().param().city) {
+            // HTML5 Geolocation
+            if (navigator.geolocation)
+                navigator.geolocation.getCurrentPosition(getLocation);
+        } else {
+            // City is specified in URL
+            city = $.url().param().city.replace("/", "");
+            locations[city.toLowerCase()] = "";
+            $("#city").val(city).trigger("change");
+        }
 
         $("#city").typeahead({
             displayKey: "name",
@@ -147,11 +163,6 @@ define([
                     }
                 });
             }
-        });
-
-        $("#city").on({
-            keyUp: fetchResults,
-            change: fetchResults
         });
     });
 });
