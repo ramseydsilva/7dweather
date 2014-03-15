@@ -46,7 +46,7 @@ define([
 
     function clearResults() {
         $('#title, #summary, #commentary, #chart').html("");
-        $("#commentary").css("visibility", "hidden");
+        $("#commentary").css("display", "none");
         commentLoop = "";
     }
 
