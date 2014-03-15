@@ -16,9 +16,10 @@ define([
     "jquery",
     "underscore",
     "text!templates/day.html",
+    "text!templates/summary.html",
     "typeahead",
     "bootstrap"
-], function($, _, dayTemplate) {
+], function($, _, dayTemplate, summaryTemplate) {
     var locations = {};
     var city = "";
     var title = "";
@@ -53,27 +54,42 @@ define([
         title = "";
         $('#title').html(title);
         $('#chart').html("");
+        $("#summary").html("");
     }
 
     function displayResults() {
         $('#title').html(title);
         $('#chart').html("");
+        $('#summary').html("");
+        var totalTemp = 0;
         _.each(results, function(data) {
             var date = new Date(data.dt * 1000);
+            var avgTemp = Math.floor((data.temp.max + data.temp.min) / 2);
             var context = {
                 day: days[date.getDay()],
                 date: months[date.getMonth()] + " " + date.getDate(),
                 maxTemp: data.temp.max,
                 minTemp: data.temp.min,
-                avgTemp: Math.floor((data.temp.max + data.temp.min) / 2),
+                avgTemp: avgTemp,
                 desc: data.weather[0].main,
                 img: images[data.weather[0].description],
                 longDesc: data.weather[0].description,
+                humidity: data.humidity,
+                pressure: data.pressure,
+                speed: data.speed,
                 isFirst: !_.indexOf(results, data),
                 isLast: results.length == _.indexOf(results, data) + 1
             };
+            totalTemp += avgTemp;
             $('#chart').append(_.template(dayTemplate, context));
         });
+        context = {
+            avgTemp: (totalTemp / 7).toFixed(2),
+            avgHumidity: (_.reduce(results, function(memo, data) { return memo + data.humidity }, 0) / 7).toFixed(2),
+            avgPressure: (_.reduce(results, function(memo, data) { return memo + data.pressure }, 0) / 7).toFixed(2),
+            avgSpeed: (_.reduce(results, function(memo, data) { return memo + data.speed }, 0) / 7).toFixed(2)
+        }
+        $('#summary').html(_.template(summaryTemplate, context));
     }
 
     function fetchResults() {
@@ -89,7 +105,7 @@ define([
                 dataType: "jsonp",
                 success: function(data) {
                     if (data.cod == "200") {
-                        title = "Displaying Weather Forecast for " + data.city.name;
+                        title = "Weather Forecast for " + data.city.name;
                         results = data.list;
                     }
                 },
