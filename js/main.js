@@ -23,7 +23,7 @@ define([
     "typeahead",
     "bootstrap"
 ], function($, _, dayTemplate, summaryTemplate) {
-    var cities = [], results = {};
+    var locations = [], results = {};
     days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
     months = ['January','February','March','April','May','June','July','August','September','October','November','December'],
     images = {  "light rain": 'cloudy_s_rain.png',
@@ -50,7 +50,10 @@ define([
     }
 
     function displayResults() {
-        $('#title').html("Weather Forecast for " + results.city.name);
+        var location = results.city.name;
+        if (results.city.name == "" && results.city.country != "")
+            location = $("#location").val();
+        $('#title').html("Weather Forecast for " + location);
         $('#chart').html("");
         $('#summary').html("");
 
@@ -91,24 +94,25 @@ define([
     }
 
     function hideDropDownIfNotNeeded() {
-        // If city input value matches drop down element, close the drop down
-        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == $("#city").val().toLowerCase())
+        // If location input value matches drop down element, close the drop down
+        if ($(".dropdown-menu li").length == 1 && $(".dropdown-menu li").text().toLowerCase() == $("#location").val().toLowerCase())
             $(".dropdown-menu").css("display", "none !important");
     }
 
     function fetchData() {
-        var city = $("#city").val();
+        var location = $("#location").val();
 
-        if (city == "") {
+        if (location == "") {
             // Input is blank, clear result pane
             clearResults();
         } else {
             hideDropDownIfNotNeeded();
 
-            // Check if the city in the input is a real city against the cities previously returned in the dropdown
-            if (_.find(cities, function(savedCity) { return savedCity.toLowerCase() == city.toLowerCase(); })) {
+            // Check if the location in the input is a real location against the cities previously returned in the dropdown
+            var locationFetchedPreviously = _.find(locations, function(savedLocation) { return savedLocation.toLowerCase() == location.toLowerCase(); });
+            if (!!locationFetchedPreviously) {
                 $.ajax({
-                    url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + city,
+                    url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + location,
                     dataType: "jsonp",
                     success: function(data) {
                         if (data.cod == "200") {
@@ -123,23 +127,29 @@ define([
                     }
                 });
             } else {
-                // Not a real city, so clear the result Pane
+                // Not a real location, so clear the result Pane
                 clearResults();
-                $("#title").html("Is that a real city? Please try again.");
+                $("#title").html("Is that a real location? Please try again.");
             }
         }
     }
 
-    function fetchCities(query, callback) {
+    function fetchLocations(query, callback) {
         $.ajax({
             url: "http://api.openweathermap.org/data/2.5/find?type=like&q=" + query,
             dataType: "jsonp",
             success: function (data) {
                 if (data.cod == "200") {
-                    var newCities = _.map(data.list, function(newCity) { return newCity.name });
-                    cities = _.union(cities, newCities);
-                    callback(newCities); // callback is either to show dropdown or fetchData
+                    var newLocations = _.map(data.list, function(newLocation) {
+                        if (newLocation.name == "" && newLocation.country != "")
+                            return query;
+                        return newLocation.name;
+                    });
+                    locations = _.union(locations, newLocations);
+                    if (!!callback)
+                        callback(newLocations); // callback is either to show dropdown or fetchData
                     hideDropDownIfNotNeeded();
+                    return newLocations;
                 }
             }
         });
@@ -147,34 +157,34 @@ define([
 
     function getLocation(position) {
         var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
-        $.getJSON(url, function(city){
-            if (city.cod == "200") {
-                $("#city").val(city.name);
-                fetchCities(city.name, fetchData);
+        $.getJSON(url, function(location){
+            if (location.cod == "200") {
+                $("#location").val(location.name);
+                fetchLocations(location.name, fetchData);
             }
         });
     }
 
     $(document).ready(function() {
 
-        $("#city").keyup(fetchData).change(fetchData);
+        $("#location").keyup(fetchData).change(fetchData);
 
-        if (!!$.url().param().city) {
-            // City is specified in URL
-            var city = $.url().param().city.replace("/", "");
-            $("#city").val(city);
-            fetchCities(city, fetchData);
+        if (!!$.url().param().location) {
+            // city is specified in URL
+            var location = $.url().param().location.replace("/", "");
+            $("#location").val(location);
+            fetchLocations(location, fetchData);
         } else if (navigator.geolocation) {
-            // Use HTML5 Geolocation to find users city
+            // Use HTML5 Geolocation to find users location
             navigator.geolocation.getCurrentPosition(getLocation);
         }
 
-        $("#city").typeahead({
+        $("#location").typeahead({
             displayKey: "name",
             minLength: 3,
             items: "all",
             autoSelect: false,
-            source: fetchCities
+            source: fetchLocations
         });
 
     });
