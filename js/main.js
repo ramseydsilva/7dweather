@@ -99,6 +99,10 @@ define([
             $(".dropdown-menu").css("display", "none !important");
     }
 
+    function isLocationPreviouslyFetched(location) {
+        return !!_.find(locations, function(savedLocation) { return savedLocation.toLowerCase() == location.toLowerCase(); });
+    }
+
     function fetchData() {
         var location = $("#location").val();
 
@@ -109,8 +113,7 @@ define([
             hideDropDownIfNotNeeded();
 
             // Check if the location in the input is a real location against the cities previously returned in the dropdown
-            var locationFetchedPreviously = _.find(locations, function(savedLocation) { return savedLocation.toLowerCase() == location.toLowerCase(); });
-            if (!!locationFetchedPreviously) {
+            if (isLocationPreviouslyFetched(location)) {
                 $.ajax({
                     url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + location,
                     dataType: "jsonp",
@@ -153,6 +156,18 @@ define([
         });
     }
 
+    function getLocations(query, callback) {
+        if (query.length > 2) {
+            // Don't bother fetching location for two lettered queries
+            if (isLocationPreviouslyFetched(query)) {
+                // Check if location was previously returned by API to save making unnecessary calls
+                callback();
+            } else {
+                fetchLocations(query, callback);
+            }
+        }
+    }
+
     function getLocation(position) {
         var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
         $.getJSON(url, function(location){
@@ -165,7 +180,11 @@ define([
 
     $(document).ready(function() {
 
-        $("#location").keyup(fetchData).change(fetchData);
+        $("#location").keyup(function() {
+            getLocations($(this).val(), fetchData);
+        }).change(function() {
+            getLocations($(this).val(), fetchData);
+        });
 
         if (!!$.url().param().location) {
             // city is specified in URL
