@@ -46,6 +46,8 @@ define([
 
     function clearResults() {
         $('#title, #summary, #commentary, #chart').html("");
+        $("#commentary").css("display", "none");
+        commentLoop = "";
     }
 
     function getIntro() {
@@ -69,15 +71,17 @@ define([
         $("#commentary").css("display", "block");
         var keys = _.keys(commentary);
         $("#commentary").html(commentary[keys[0]]);
-        (function myLoop (i) {
+        commentLoop = function myLoop (i) {
             var next = (i + 1) % keys.length;
             var prev = Math.abs((i - 1) % keys.length);
             var text = commentary[keys[i]];
             setTimeout(function () {
-                $("#commentary").html(commentary[keys[i]]);
-                myLoop(next);
+                if (typeof commentLoop == "function")
+                    $("#commentary").html(commentary[keys[i]]);
+                    commentLoop(next);
             }, commentary[keys[prev]].length*100)
-        })(keys.length);
+        };
+        commentLoop(keys.length);
     }
 
     function displayResults() {
