@@ -1,0 +1,12 @@
+<div class="col-sm-2">
+    <ul class="weather">
+        <li class="day"><%= day %></li>
+        <li class="date"><%= date %></li>
+        <li class="avgTemp"><span><%= avgTemp %></span> &deg;C</li>
+        <% if (!!img) { %><li class="img"><img src="img/<%= img %>" /></li><% } %>
+        <li class="desc"><%= desc %></li>
+        <li class="longDesc"><%= longDesc %></li>
+        <li class="minTemp">Min <%= minTemp %></li>
+        <li class="maxTemp">Max <%= maxTemp %></li>
+    </ul>
+</div>

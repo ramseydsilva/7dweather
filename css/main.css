@@ -1,0 +1,49 @@
+body {
+    background: transparent url("../img/bg.png") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.weather {
+    background-color: white;
+    list-style: none;
+    margin: 0 0 10px 0;
+    padding: 5px 10px;
+}
+
+.navbar-inverse { background-color: #465B9F; }
+.navbar-inverse .navbar-brand { color: white; }
+.form-group { position: relative; }
+.dropdown-menu { top: 35px; left: 0; width: 100%; }
+.weather { text-align: center; }
+.weather .day { font-size: 22px; }
+.weather .date { font-size: 16px; }
+.weather .avgTemp { center; font-size: 30px; }
+.weather .avgTemp span { margin-left: 10px; font-size: 55px; }
+.weather .desc { font-size: 20px; }
+
+@media (min-width: 768px){
+    .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2  {
+        width: 14.28%;
+        *width: 14.28%;
+        padding: 10px !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2 {
+        width: 14.28%;
+        *width: 14.28%;
+        padding: 10px !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    .sevencolumns .col-md-2, .sevencolumns .col-sm-2, .sevencolumns .col-lg-2 {
+        width: 14.28%;
+        *width: 14.28%;
+        padding: 10px !important;
+    }
+}
