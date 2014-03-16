@@ -67,8 +67,7 @@ define([
         commentary["intro"] = getIntro();
         commentary["today"] = "Today's average temperature is " + results.list[0].context.avgTemp + "&deg; C.";
         commentary["tomorrow"] = "Tomorrow the average temperature will be " + results.list[1].context.avgTemp + "&deg; C.";
-
-        $("#commentary").css("visibility", "visible");
+        $("#commentary").css("display", "block");
         var keys = _.keys(commentary);
         $("#commentary").html(commentary[keys[0]]);
         commentLoop = function myLoop (i) {
