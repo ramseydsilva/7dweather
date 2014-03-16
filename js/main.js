@@ -48,18 +48,6 @@ define([
         $('#title, #summary, #chart').html("");
     }
 
-    function getIntro() {
-        var avgTemp = results.averages.avgTemp;
-        var intro = "Looks like a bright and warm week ahead!";
-        if (avgTemp < 20)
-            intro = "We are expected to have a moderately cold week.";
-        if (avgTemp < 10)
-            intro = "Looks like a pretty cold week ahead.";
-        if (avgTemp < 0)
-            intro = "Bundle up! It's gonna be freezing this week.";
-        return intro + " The average Temperature will be " + Math.floor(results.averages.avgTemp) + "&deg;C.";
-    }
-
     function displayResults() {
         hideDropDownIfNotNeeded();
 
@@ -116,36 +104,29 @@ define([
         return !!_.find(locations, function(savedLocation) { return savedLocation.toLowerCase() == location.toLowerCase(); });
     }
 
-    function fetchData() {
+    function fetchData(location) {
         var location = $("#location").val();
-
-        if (location == "") {
-            // Input is blank, clear result pane
-            clearResults();
-        } else {
-
-            // Check if the location in the input is a real location against the cities previously returned in the dropdown
-            if (isLocationPreviouslyFetched(location)) {
-                $.ajax({
-                    url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + location,
-                    dataType: "jsonp",
-                    success: function(data) {
-                        if (data.cod == "200") {
-                            results = data;
-                            displayResults();
-                        }
-                    },
-                    error: function() {
-                        // Some error was thrown, need to handle this error
-                        clearResults();
-                        $("#title").html("An unidentified error has occured, please try again in some time");
+        // Check if the location in the input is a real location against the cities previously returned in the dropdown
+        if (isLocationPreviouslyFetched(location)) {
+            $.ajax({
+                url: "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&mo&cnt=7&q=" + location,
+                dataType: "jsonp",
+                success: function(data) {
+                    if (data.cod == "200") {
+                        results = data;
+                        displayResults();
                     }
-                });
-            } else {
-                // Not a real location, so clear the result Pane
-                clearResults();
-                $("#title").html("Is that a real location? Please try again.");
-            }
+                },
+                error: function() {
+                    // Some error was thrown, need to handle this error
+                    clearResults();
+                    $("#title").html("An unidentified error has occured, please try again in some time");
+                }
+            });
+        } else {
+            // Not a real location, so clear the result Pane
+            clearResults();
+            $("#title").html("Is that a real location? Please try again.");
         }
     }
 
@@ -169,7 +150,9 @@ define([
     }
 
     function getLocations(query, callback) {
-        if (query.length > 2) {
+        if (query == "")
+            clearResults();
+        else if (query.length > 2) {
             // Don't bother fetching location for two lettered queries
             if (isLocationPreviouslyFetched(query)) {
                 // Check if location was previously returned by API to save making unnecessary calls
