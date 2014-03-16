@@ -45,9 +45,7 @@ define([
                 };
 
     function clearResults() {
-        $('#title, #summary, #commentary, #chart').html("");
-        $("#commentary").css("display", "none");
-        commentLoop = "";
+        $('#title, #summary, #chart').html("");
     }
 
     function getIntro() {
@@ -62,27 +60,6 @@ define([
         return intro + " The average Temperature will be " + Math.floor(results.averages.avgTemp) + "&deg;C.";
     }
 
-    function displayCommentary() {
-        var commentary = {};
-        commentary["intro"] = getIntro();
-        commentary["today"] = "Today's average temperature is " + results.list[0].context.avgTemp + "&deg; C.";
-        commentary["tomorrow"] = "Tomorrow the average temperature will be " + results.list[1].context.avgTemp + "&deg; C.";
-        $("#commentary").css("display", "block");
-        var keys = _.keys(commentary);
-        $("#commentary").html(commentary[keys[0]]);
-        commentLoop = function myLoop (i) {
-            var next = (i + 1) % keys.length;
-            var prev = Math.abs((i - 1) % keys.length);
-            var text = commentary[keys[i]];
-            setTimeout(function () {
-                if (typeof commentLoop == "function")
-                    $("#commentary").html(commentary[keys[i]]);
-                    commentLoop(next);
-            }, commentary[keys[prev]].length*100)
-        };
-        commentLoop(keys.length);
-    }
-
     function displayResults() {
         hideDropDownIfNotNeeded();
 
@@ -90,7 +67,7 @@ define([
         if (results.city.name == "" && results.city.country != "")
             location = $("#location").val();
         $('#title').html("Weather Forecast for " + location);
-        $('#summary, #commentary, #chart').html("");
+        $('#summary, #chart').html("");
 
         var totalTemp = 0, context = {};
 
@@ -127,8 +104,6 @@ define([
             avgSpeed: (_.reduce(weekData, function(memo, dayData) { return memo + dayData.speed }, 0) / 7).toFixed(2)
         }
         $('#summary').html(_.template(summaryTemplate, context));
-
-        displayCommentary();
     }
 
     function hideDropDownIfNotNeeded() {

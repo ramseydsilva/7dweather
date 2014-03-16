@@ -1,6 +1,6 @@
 <div class="weatherBlock col-sm-2 <%= isFirst %>First <%= isLast %>Last">
     <ul class="weather visible-xs">
-        <li class="text"><%= day %>, <%= date %> - Avg Temp: <%= avgTemp %> &deg;C - Min: <%= minTemp %> - Max: <%= maxTemp %></li>
+        <li class="text"><%= day %>, <%= date %>, <%= avgTemp %>&deg;C, Min <%= minTemp %>, Max <%= maxTemp %></li>
         <% if (!!img) { %><li class="img"><img src="img/<%= img %>" /></li><% } %>
     </ul>
     <ul class="weather hidden-xs">
