@@ -164,7 +164,7 @@ define([
                     error: function() {
                         // Some error was thrown, need to handle this error
                         clearResults();
-                        $("#title").html("Ooops! An unidentified error has occured, please try again in some time");
+                        $("#title").html("An unidentified error has occured, please try again in some time");
                     }
                 });
             } else {
